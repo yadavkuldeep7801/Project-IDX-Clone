@@ -24,3 +24,15 @@ export const createProjectofReact = async (projectId ) => {
   
 }
 
+export const createProjectofnextjs = async (projectId ) => {
+  await fs.mkdir(`./projects/${projectId}`, { recursive: true });
+
+    const result = await exec(`npx create-next-app@latest sandbox1  --ts --eslint --tailwind --app --src-dir`,{
+    cwd: `./projects/${projectId}`,
+    
+  })
+
+  return result
+
+}
+

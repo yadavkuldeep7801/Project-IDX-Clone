@@ -1,5 +1,6 @@
 
-import { createProjectofReact } from '../service/ProjectCreation.js';
+import { createProjectofReact , createProjectofnextjs } from '../service/ProjectCreation.js';
+
 import tree from 'directory-tree';
 import path from 'path';
 import uuidv4  from 'uuid4';
@@ -16,6 +17,13 @@ export const ProjectCreactionController = async (req, res) => {
            const result = await createProjectofReact(projectId);
           const path_directory = path.resolve(`./projects/${projectId}`);
            const projectTree = tree(path_directory);
+        return res.status(200).json({message: "Project created successfully", projectId, result, projectTree});
+    }
+    else if (projectType === 'nextjs') {
+        const projectId = uuidv4();
+        const result = await createProjectofnextjs(projectId);
+        const path_directory = path.resolve(`./projects/${projectId}`);
+        const projectTree = tree(path_directory);
         return res.status(200).json({message: "Project created successfully", projectId, result, projectTree});
     }
     else{
