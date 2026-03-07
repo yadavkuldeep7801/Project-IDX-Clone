@@ -2,32 +2,7 @@ import React, { useState } from 'react';
 import MonacoEditor from './components/MonacoEditor';
 import './App.css';
 
-// A mock project tree. Normally this would come from your backend.
-const mockProjectTree = {
-  name: "my-fake-project",
-  path: "/projects/my-fake-project",
-  children: [
-    {
-      name: "src",
-      path: "/projects/my-fake-project/src",
-      type: "directory",
-      children: [
-        { name: "App.js", path: "/projects/my-fake-project/src/App.js", type: "file" },
-        { name: "index.js", path: "/projects/my-fake-project/src/index.js", type: "file" }
-      ]
-    },
-    { name: "package.json", path: "/projects/my-fake-project/package.json", type: "file" },
-    { name: "README.md", path: "/projects/my-fake-project/README.md", type: "file" }
-  ]
-};
 
-// Mock file contents
-const initialMockFiles = {
-  "/projects/my-fake-project/src/App.js": `import React from 'react';\n\nfunction App() {\n  return <h1>Hello from the generated project!</h1>;\n}\n\nexport default App;`,
-  "/projects/my-fake-project/src/index.js": `import React from 'react';\nimport ReactDOM from 'react-dom/client';\nimport App from './App';\n\nconst root = ReactDOM.createRoot(document.getElementById('root'));\nroot.render(<App />);`,
-  "/projects/my-fake-project/package.json": `{\n  "name": "my-fake-project",\n  "version": "1.0.0",\n  "dependencies": {\n    "react": "^18.2.0",\n    "react-dom": "^18.2.0"\n  }\n}`,
-  "/projects/my-fake-project/README.md": `# My Fake Project\n\nThis is a generated project.`
-};
 
 // Helper function to get language based on extension
 const getLanguageFromPath = (path) => {
