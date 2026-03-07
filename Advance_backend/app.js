@@ -7,10 +7,13 @@ dotenv.config();
 import projectRoute from './routes/ProjectRoute.js';
 
 
+import cors from 'cors';
+
 const app = express();
 
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 
 
@@ -27,7 +30,7 @@ app.use('/api/v1/project', projectRoute)
 
 
 
-app.listen(PORT, ()=>{
+app.listen(PORT, () => {
     console.log(`localhost:${PORT} is running`)
 
 })
