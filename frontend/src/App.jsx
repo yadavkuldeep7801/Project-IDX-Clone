@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import MonacoEditor from './components/MonacoEditor';
 import './App.css';
 
+import {createEditorStore} from './store/editoStore';
+
+
 
 
 // Helper function to get language based on extension
@@ -37,9 +40,10 @@ function App() {
 
       if (data.projectTree) {
         setProjectTree(data.projectTree);
+        createEditorStore.setProjectTree(data.projectTree);
+        createEditorStore.setActiveFile(null);
         // Reset file contents when new project is created
-        setFileContents({});
-        setActiveFile(null);
+        createEditorStore.setFileContents({});
       } else {
         alert("Failed to create project: " + (data.message || "Unknown error"));
       }
@@ -109,6 +113,7 @@ function App() {
   const currentCode = activeFile && fileContents[activeFile] !== undefined ? fileContents[activeFile] : '';
   const currentLanguage = activeFile ? getLanguageFromPath(activeFile) : 'plaintext';
 
+  
   return (
     <div className="App">
       {/* Sidebar for File Explorer */}

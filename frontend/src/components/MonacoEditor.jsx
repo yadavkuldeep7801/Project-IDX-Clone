@@ -19,6 +19,7 @@ function MonacoEditor({ code, language = 'javascript', onChange }) {
                 value={value}
                 theme="vs-dark"
                 onChange={handleEditorChange}
+                
                 options={{
                     minimap: { enabled: false },
                     fontSize: 14,
