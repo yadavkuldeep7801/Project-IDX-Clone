@@ -1,0 +1,5 @@
+{
+  "name": "Cloud Code Workspace",
+  "description": "A modern web-based code editor with project generation capabilities and a integrated file explorer.",
+  "requestFramePermissions": []
+}
