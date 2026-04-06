@@ -42,7 +42,6 @@ export const handleContainerCreate = async (
       
       Env: ["HOST=0.0.0.0"],
       
-      Cmd: ["cd", "sandbox", "&&", "npm", "run", "dev", "--", "--host", "0.0.0.0"],
       
       Labels: {
         projectId: projectId,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Wifi, WifiOff, RefreshCw, Hash } from 'lucide-react';
+import { Plus, Wifi, WifiOff, RefreshCw, Hash, Terminal as TerminalIcon, Globe } from 'lucide-react';
 import { ProjectTemplate } from '../../types';
 import { projectService } from '../../services/projectService';
 import { useProjectStore } from '../../store/useProjectStore';
@@ -7,9 +7,13 @@ import { useProjectStore } from '../../store/useProjectStore';
 interface SidebarProps {
   onGenerateProject: (template: ProjectTemplate) => void;
   children?: React.ReactNode;
+  showTerminal: boolean;
+  setShowTerminal: (show: boolean) => void;
+  showPreview: boolean;
+  setShowPreview: (show: boolean) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onGenerateProject, children }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onGenerateProject, children, showTerminal, setShowTerminal, showPreview, setShowPreview }) => {
   const [status, setStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const { projectId } = useProjectStore();
 
@@ -83,7 +87,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ onGenerateProject, children })
       <div className="flex-1 overflow-y-auto">
         {children}
       </div>
-      <div className="p-4 text-[10px] text-zinc-600 border-t border-zinc-800">
+ <div className="p-4 text-[10px] text-zinc-600 border-t border-zinc-800 flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setShowTerminal(!showTerminal)}
+            className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded border transition-all ${
+              showTerminal 
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-zinc-400'
+            }`}
+          >
+            <TerminalIcon className="w-3 h-3" />
+            Terminal
+          </button>
+          <button 
+            onClick={() => setShowPreview(!showPreview)}
+            className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded border transition-all ${
+              showPreview 
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-zinc-400'
+            }`}
+          >
+            <Globe className="w-3 h-3" />
+            Preview
+          </button>
+        </div>
         {status === 'offline' && (
           <div className="mb-2 text-rose-400 font-medium">
             ⚠️ Backend unreachable. Check ngrok and CORS.

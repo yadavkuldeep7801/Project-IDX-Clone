@@ -1,10 +1,7 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+
 
 import { useEffect, useCallback, useState } from 'react';
-import { Sidebar } from './components/Sidebar/Sidebar';
+import { Sidebar } from './components/Sidebar/Sidebar'
 import { FileTree } from './components/FileTree/FileTree';
 import { EditorPanel } from './components/EditorPanel/EditorPanel';
 import { FileNode, ProjectTemplate } from './types';
@@ -13,7 +10,8 @@ import { useProjectStore } from './store/useProjectStore';
 import { projectService, mapBackendTreeToFiles } from './services/projectService';
 import { useQuery } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
-
+import { Terminal } from './components/Terminal/Terminal';
+import {WebPreview} from './components/WebPreview/Webpreview';
 export default function App() {
   const {
     files,
@@ -54,7 +52,7 @@ export default function App() {
     queryFn: () => projectService.getProject(projectId!),
     enabled: !!projectId && files.length === 0, // Only fetch if we have an ID but no files yet
   });
-
+;
   // Sync query data with store
   useEffect(() => {
     if (data) {
@@ -150,6 +148,8 @@ export default function App() {
   }, [activeFile, fetchFileContent, isSocketConnected]);
 
   const [isBackendReachable, setIsBackendReachable] = useState<boolean | null>(null);
+   const [showTerminal, setShowTerminal] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     const check = async () => {
@@ -160,10 +160,17 @@ export default function App() {
     const interval = setInterval(check, 10000);
     return () => clearInterval(interval);
   }, []);
-
+ 
   return (
     <div className="flex h-screen w-full bg-[#0d1117] text-zinc-300 font-sans overflow-hidden">
-      <Sidebar onGenerateProject={handleGenerateProject}>
+      <Sidebar 
+        onGenerateProject={handleGenerateProject}
+        // onGoHome={() => setShowLanding(true)}
+        showTerminal={showTerminal}
+        setShowTerminal={setShowTerminal}
+        showPreview={showPreview}
+        setShowPreview={setShowPreview}
+      >
         <div className="px-4 py-2 border-b border-white/5 flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${isBackendReachable === true ? 'bg-emerald-500' : isBackendReachable === false ? 'bg-rose-500' : 'bg-zinc-500'}`} />
           <span className="text-[10px] uppercase tracking-wider font-medium text-zinc-500">
@@ -195,6 +202,7 @@ export default function App() {
         )}
       </Sidebar>
 
+
       <main className="flex-1 flex flex-col relative">
         <AnimatePresence mode="wait">
           <motion.div
@@ -212,7 +220,28 @@ export default function App() {
             />
           </motion.div>
         </AnimatePresence>
+
+        
+         {showTerminal && (
+            <motion.div 
+              initial={{ height: 0 }}
+              animate={{ height: '30%' }}
+              className="min-h-[150px] max-h-[50%] z-10"
+            >
+              <Terminal onClose={() => setShowTerminal(false)} />
+            </motion.div>
+          )}
       </main>
+           {showPreview && (
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: '400px' }}
+            className="h-full z-20"
+          >
+            <WebPreview onClose={() => setShowPreview(false)} />
+          </motion.div>
+        )}
+  
     </div>
   );
 }

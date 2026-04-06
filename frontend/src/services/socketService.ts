@@ -17,8 +17,7 @@ export const socketService = {
 
     socket = io(`${origin}/editor`, {
       query: { projectId },
-      transports: ['websocket'],
-      reconnection: true,
+     
     });
 
     currentProjectId = projectId;

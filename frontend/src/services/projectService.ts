@@ -2,8 +2,7 @@ import axios from 'axios';
 import { FileNode } from '../types';
 
 // Use VITE_API_URL if provided, otherwise fallback to your ngrok URL
-const API_BASE_URL = (import.meta as any).env.VITE_API_URL || 'https://58cb-2409-40c1-19-f017-f0a1-8e8-9cd9-2b21.ngrok-free.app/api/v1';
-
+const API_BASE_URL = (import.meta as any).env.VITE_API_URL 
 export interface BackendProjectNode {
   path: string;
   name: string;
@@ -59,13 +58,25 @@ export const projectService = {
 
   getProject: async (projectId: string): Promise<CreateProjectResponse> => {
     console.log(`🔍 Fetching project: ${projectId}`);
-    try {
-      const response = await apiClient.get(`/project/${projectId}`);
+
+    try{
+      const response = await apiClient.get('/project/project', {
+        params: { projectId }
+      });
       return response.data;
-    } catch (error: any) {
-      console.error('❌ Fetch Project Error:', error.message);
+
+    }
+    catch(error:any){
+      console.error('❌ Fetch Project Error Details:', {
+        projectId,
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      });
       throw error;
     }
+    
+
   },
   
   getBaseUrl: () => API_BASE_URL,
@@ -86,7 +97,7 @@ export const projectService = {
   getFileContent: async (path: string): Promise<string> => {
     console.log(`📂 Fetching file content for: ${path} at ${API_BASE_URL}/project/file-content`);
     try {
-      const response = await apiClient.get('/project/file-content', {
+      const response = await apiClient.get('/project/project/file-content', {
         params: { path }
       });
       return response.data.content;
@@ -101,6 +112,7 @@ export const projectService = {
     }
   }
 };
+
 export const refreshProjectTree = async (
   projectId: string,
   setProjectTree: (data: FileNode) => void
