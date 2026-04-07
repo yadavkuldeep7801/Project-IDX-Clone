@@ -1,13 +1,18 @@
 import path from "path";
 import chokidar from "chokidar";
-import express from "express";
+import express, { json } from "express";
 import { Server } from "socket.io";
 import fs from "fs/promises";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import projectRoute from "./routes/ProjectRoute.js";
 import cors from "cors";
-import { log } from "console";
+import { WebSocketServer } from "ws";
+import querystring from "querystring";
+import { handleShellCreation } from "./Container/handleShellCreation.js";
+
+
+import {handleContainerCreate} from "./Container/ContainerCreation.js";
 
 dotenv.config();
 
@@ -51,9 +56,10 @@ editorNamespace.on("connection", (socket) => {
   
   socket.join(projectId);
 
-  console.log(`Client connected to project ${projectId}`);
+ 
+  
 
-  // ✅ Get file content
+  
   socket.on("getFileContent", async ({ path: filePath }) => {
     try {
       const projectRoot = path.join(process.cwd(), "projects", projectId);
@@ -78,7 +84,7 @@ editorNamespace.on("connection", (socket) => {
     
    ;
 
-    console.log("✏️ Writing file:", filePath);
+    console.log(" Writing file:", filePath);
 
     await fs.writeFile(filePath, content, "utf8");
 
@@ -99,7 +105,7 @@ editorNamespace.on("connection", (socket) => {
   });
 });
 
-// ✅ Watch files and emit updates
+
 chokidar
   .watch(path.join(process.cwd(), "projects"), {
     ignoreInitial: true
@@ -123,4 +129,65 @@ chokidar
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+
+
+const wsForShell = new WebSocketServer({
+    noServer: true,
+  });
+
+
+  server.on("upgrade", (req, socket, head) => {
+  const isShell = req.url?.includes("/terminal");
+
+  if (!isShell) {
+    socket.destroy(); 
+    return;
+  }
+
+  console.log("Upgrade URL:", req.url);
+
+  const query = req.url.split("?")[1] || "";
+  const { projectId } = querystring.parse(query);
+
+  if (!projectId) {
+    socket.destroy();
+    return;
+  }
+
+  handleContainerCreate(projectId, wsForShell, req, socket, head);
+});
+
+ wsForShell.on("connection", (ws, req) => {
+  const container = ws.container; 
+
+  const ports = ws.ports['5173/tcp'][0].HostPort;
+
+  if(ports){
+
+    ws.send(JSON.stringify({ type: "port", port: ports }))
+
+  }
+  
+
+  if (!container) {
+    ws.close();
+    return;
+  }
+
+  handleShellCreation(container, ws);
+
+  ws.on("close", async () => {
+    try {
+      await container.remove({ force: true });
+      console.log(`Container ${container.id} removed`);
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  ws.on("error", (err) => {
+    console.error("WebSocket error:", err);
+  });
 });

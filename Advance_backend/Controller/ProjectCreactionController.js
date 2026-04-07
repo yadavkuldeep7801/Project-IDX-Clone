@@ -37,22 +37,21 @@ export const ProjectCreactionController = async (req, res) => {
 }
 
 import fs from 'fs/promises';
+import { log } from 'console';
 
 export const getFileContent = async (req, res) => {
-    try {
-        const filePath = req.query.path;
-
+    try{
+        const { filePath } = req.query;
+        console.log("Requested file path:", filePath);
         if (!filePath) {
-            return res.status(400).json({ message: "Path is required" });
+            return res.status(400).json({ message: "Missing filePath" });
         }
+       
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        return res.status(200).json({ content: fileContent.toString() });
 
-        // In a real production app, ensure you sanitize this path to avoid directory traversal attacks!
-        // Right now, this reads any absolute path given since react-tree provides absolute paths.
-        const content = await fs.readFile(filePath, 'utf-8');
-        return res.status(200).json({ content });
-
-    } catch (error) {
-        console.error("Error reading file:", error);
-        return res.status(500).json({ message: "Could not read file", error: error.message });
+    }
+    catch(err){
+        return res.status(500).json({ message: "Something went wrong", error: err.message });
     }
 }
